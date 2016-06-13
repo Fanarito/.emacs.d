@@ -2,6 +2,9 @@
 ;; General ;;
 ;;;;;;;;;;;;;
 
+;; Default encoding
+(set-language-environment "UTF-8")
+
 ;; Initalize package.el
 (package-initialize)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
