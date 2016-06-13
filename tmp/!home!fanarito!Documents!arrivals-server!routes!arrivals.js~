@@ -1,0 +1,59 @@
+var express = require('express');
+var router = express.Router();
+var r = require('rethinkdbdash')();
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+    r.union(
+        r.table('arrivals').filter(
+            r.row("js_time").day().eq(r.now().day())
+        ).filter(
+            r.row("status_time").gt(r.now())
+        ).orderBy("status_time"),
+
+
+        r.table('arrivals').filter(
+            r.row("js_time").day().eq(r.now().day())
+        ).filter(
+            r.row.hasFields('status_time').not()
+        ).orderBy("js_time"),
+
+        r.table('arrivals').filter(
+            r.row("js_time").day().eq(r.now().day())
+        ).filter(
+            r.row("status_time").lt(r.now())
+        ).orderBy(r.desc("js_time"))
+    ).run().then(function (arrivals) {
+        return res.json(arrivals);
+    });
+});
+
+router.get('/flight_number/:number', function (req, res, next) {
+    r.table('arrivals').orderBy('status')
+        .filter({flight_number: req.params.number})
+        .run()
+        .then(function (arrivals) {
+            return res.json(arrivals);
+        });
+});
+
+router.get('/id/:id', function (req, res, next) {
+    r.table('arrivals')
+        .get(req.params.id)
+        .run()
+        .then(function (arrivals) {
+            return res.json(arrivals);
+        });
+});
+
+router.get('/date/:date', function (req, res, next) {
+    r.table('arrivals').orderBy('status')
+        .filter({date: req.params.date})
+        .orderBy("js_time")
+        .run()
+        .then(function (arrivals) {
+            return res.json(arrivals);
+        });
+});
+
+module.exports = router;

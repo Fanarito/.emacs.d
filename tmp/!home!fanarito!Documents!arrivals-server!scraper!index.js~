@@ -1,0 +1,100 @@
+var schedule = require('node-schedule');
+var Xray = require('x-ray');
+var x = Xray();
+var r = require('rethinkdbdash')();
+var moment = require('moment');
+
+var selector = [{
+    date: 'td:nth-child(1)',
+    flight_number: 'td:nth-child(2)',
+    airline: 'td:nth-child(3)',
+    to: 'td:nth-child(4)',
+    from: 'td:nth-child(4)',
+    scheduled_time: 'td:nth-child(5)',
+    status: 'td:nth-child(6)'
+}];
+
+function insert_flight_to_db(item, table) {
+    // Make flight object to javascript Date object so that RethinkDB can order it
+    var flight_time = moment(item.scheduled_time + " " + item.date, "HH:mm DD. MMMM");
+    item.js_time = flight_time.toDate();
+
+    // Create moment time object for the status time
+    // if it is provided
+    // only for arrivals at the "moment" hueue
+    var status_time;
+    if (item.status !== undefined && table === "arrivals" && item.status.indexOf('Cancel') === -1) {
+        var buf_status = item.status.split(' ');
+        status_time = moment(buf_status[1] + " " + item.date, "HH:mm DD. MMMM");
+        item.status_time = status_time.toDate();
+        //console.log(item.status_time);
+        //console.log(buf_status);
+    }
+
+    r.table(table).filter({ flight_number: item.flight_number, date: item.date, airline: item.airline}).run().then(function (results) {
+        if (results.length > 0) {
+            r.table(table).get(results[0].id).update(item).run().then(function () {
+
+            });
+        } else {
+            r.table(table).insert(item).run().then(function () {
+
+            });
+        }
+    });
+}
+
+var task = schedule.scheduleJob('*/5 * * * *', function () {
+    x('http://www.kefairport.is/English/Timetables/Arrivals/Yesterday/', 'table tr', selector)(function (err, result) {
+        console.log("Arrivals yesterday fetched inserting to db error: " + err);
+        result.forEach(function (element, index, array) {
+            delete element.to;
+            insert_flight_to_db(element, 'arrivals');
+        });
+    });
+
+    x('http://www.kefairport.is/English/Timetables/Departures/Yesterday/', 'table tr', selector)(function (err, result) {
+        console.log("Departures yesterday fetched inserting to db error: " + err);
+        result.forEach(function (element, index, array) {
+            delete element.from;
+            insert_flight_to_db(element, 'departures');
+        });
+    });
+
+
+
+
+    x('http://www.kefairport.is/English/Timetables/Arrivals/', 'table tr', selector)(function (err, result) {
+        console.log("Arrivals today fetched inserting to db error: " + err);
+        result.forEach(function (element, index, array) {
+            delete element.to;
+            insert_flight_to_db(element, 'arrivals');
+        });
+    });
+
+    x('http://www.kefairport.is/English/Timetables/Departures/', 'table tr', selector)(function (err, result) {
+        console.log("Departures yesterday fetched inserting to db error: " + err);
+        result.forEach(function (element, index, array) {
+            delete element.from;
+            insert_flight_to_db(element, 'departures');
+        });
+    });
+
+
+
+    x('http://www.kefairport.is/English/Timetables/Arrivals/Tomorrow/', 'table tr', selector)(function (err, result) {
+        console.log("Arrivals tomorrow fetched inserting to db error: " + err);
+        result.forEach(function (element, index, array) {
+            delete element.to;
+            insert_flight_to_db(element, 'arrivals');
+        });
+    });
+
+    x('http://www.kefairport.is/English/Timetables/Departures/Tomorrow/', 'table tr', selector)(function (err, result) {
+        console.log("Departures yesterday fetched inserting to db error: " + err);
+        result.forEach(function (element, index, array) {
+            delete element.from;
+            insert_flight_to_db(element, 'departures');
+        });
+    });
+});

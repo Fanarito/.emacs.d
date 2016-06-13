@@ -1,0 +1,200 @@
+;;;;;;;;;;;;;
+;; General ;;
+;;;;;;;;;;;;;
+
+;; Initalize package.el
+(package-initialize)
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")
+			 ("marmalade" . "http://marmalade-repo.org/packages/")))
+
+;; use-package.el
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; Electric pair on startup
+(electric-pair-mode 1)
+
+;; Maximize on startup
+(defun w32-maximize-frame ()
+  "Maximize the current frame (windows only)"
+  (interactive)
+  (w32-send-sys-command 61488))
+(if (eq system-type 'windows-nt)
+    (progn
+      (add-hook 'window-setup-hook 'w32-maximize-frame t))
+  (set-frame-parameter nil 'fullscreen 'maximized))
+
+;; Remove GUI guff
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+;; No splash screen
+(setq inhibit-splash-screen t)
+
+;; Set font
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11" ))
+(set-face-attribute 'default t :font "DejaVu Sans Mono-11")
+
+;; Set theme
+(use-package monokai-theme
+  :init
+  (setq monokai-use-variable-pitch nil
+        monokai-height-minus-1 1.0
+        monokai-height-plus-1 1.0
+        monokai-height-plus-2 1.0
+        monokai-height-plus-3 1.0
+        monokai-height-plus-4 1.0)
+  :config
+  (load-theme 'monokai t))
+
+;; Rainbow delimiters
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+;; Highlight matching parenthesis
+(custom-set-variables '(show-paren-delay 0.0))
+(show-paren-mode t)
+
+;; Highlight trailing whitespace
+(custom-set-variables '(show-trailing-whitespace t))
+(custom-set-faces '(trailing-whitespace ((t (:background "dim gray")))))
+
+;; Prettify symbols
+(global-prettify-symbols-mode)
+
+;; Indicate lines after EOF
+(define-fringe-bitmap 'tilde [0 0 0 113 219 142 0 0] nil nil 'center)
+(setcdr (assq 'empty-line fringe-indicator-alist) 'tilde)
+(set-fringe-bitmap-face 'tilde 'font-lock-comment-face)
+(setq-default indicate-empty-lines t)
+
+;; Show column lines in mode-lin
+(column-number-mode t)
+
+;; Cleanup mode-line
+(use-package diminish
+  :config
+  (eval-after-load "hideshow" '(diminish 'hs-minor-mode))
+  (eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
+  (eval-after-load "simple" '(diminish 'overwrite-mode))
+  (eval-after-load "autorevert" '(diminish 'auto-revert-mode)))
+
+;; Start server if not started
+(require 'server)
+(if (not (server-running-p)) (server-start))
+
+;; Backup & auto-save in one directory
+(setq backup-directory-alist `((".*" . "~/.emacs.d/tmp"))
+      auto-save-file-name-transforms `((".*" , "~/.emacs.d/tmp" t)))
+
+;; Smooth scroll
+(setq scroll-margin 0)
+(setq scroll-conservatively 10000)
+(setq scroll-preserve-screen-position t)
+
+;; y/n instead of yes/no
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; Wrap text at 80 chars
+(setq-default fill-column 80)
+
+;; Auto-update changed files
+(global-auto-revert-mode t)
+
+;; Better same-name buffers
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+
+;; Remember last position for reopened files
+(if (version< emacs-version "25.0")
+    (progn (require 'saveplace)
+           (setq-default save-place t))
+  (save-place-mode 1))
+
+;; Disable garbage collection in mini-buffer
+(defun my-minibuffer-setup-hook ()
+  (setq gc-cons-threshold most-positive-fixnum))
+(defun my-minibuffer-exit-hook ()
+  (setq gc-cons-threshold 800000))
+(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; Install extensions ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package magit)
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :config
+  (yas-global-mode 1))
+
+;;;;;;;;;;;;;;;;;;;
+;; Sane defaults ;;
+;;;;;;;;;;;;;;;;;;;
+;; (use-package sane-defaults)
+
+;; Expand-region
+(use-package expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+;; Don't use expand-region fast keys
+(setq expand-region-fast-keys-enabled nil)
+
+;; Show expand-region command used
+(setq er--show-expansion-message t)
+
+;; Smart M-x is smart
+(use-package smex)
+(smex-initialize)
+
+;; Run at full power please
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+
+
+;;;;;;;;;;
+;; Helm ;;
+;;;;;;;;;;
+(use-package helm
+  :diminish helm-mode
+  :init
+  (require 'helm-config)
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t)
+  :config
+  (helm-mode 1)
+  (custom-set-variables
+   '(helm-recentf-fuzzy-match t)
+   '(helm-buffers-fuzzy-matching t)
+   '(helm-M-x-fuzzy-match t)
+   '(helm-apropos-fuzzy-match t)
+   '(helm-completion-in-region-fuzzy-match t)))
+
+;; Helm keybindings
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+
+
+;; File associatons
+;; setup files ending in “.js” to open in js2-mode
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+
+;; Company
+(use-package company)
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; Replace selected text
+(delete-selection-mode 1)
