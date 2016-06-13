@@ -1,5 +1,0 @@
-let thing = function () {
-    for (int i = 0; i < 20; i++) {
-	console.log(i);
-    }
-};
