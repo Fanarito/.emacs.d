@@ -151,6 +151,14 @@
 (use-package ace-window)
 (global-set-key (kbd "M-p") 'ace-window)
 
+;; smart-parens
+(use-package smartparens)
+(require 'smartparens-config)
+
+;; indent guide
+(use-package indent-guide)
+(indent-guide-global-mode)
+
 ;;;;;;;;;;;;;;;;;;;
 ;; Sane defaults ;;
 ;;;;;;;;;;;;;;;;;;;
@@ -211,6 +219,13 @@
 ;; Company
 (use-package company)
 (add-hook 'after-init-hook 'global-company-mode)
+
+;; jedi-company
+(use-package company-jedi)
+
+;; php
+(use-package php-mode)
+(use-package ac-php)
 
 ;; Replace selected text
 (delete-selection-mode 1)
