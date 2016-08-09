@@ -6,11 +6,14 @@
 (set-language-environment "UTF-8")
 
 ;; Initalize package.el
+(require 'package)
+
 (package-initialize)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
                          ("melpa-stable" . "http://stable.melpa.org/packages/")
-			 ("marmalade" . "http://marmalade-repo.org/packages/")))
+			 ("marmalade" . "http://marmalade-repo.org/packages/")
+			 ("elpy" . "https://jorgenschaefer.github.io/packages/")))
 
 ;; use-package.el
 (unless (package-installed-p 'use-package)
@@ -77,6 +80,10 @@
 (setcdr (assq 'empty-line fringe-indicator-alist) 'tilde)
 (set-fringe-bitmap-face 'tilde 'font-lock-comment-face)
 (setq-default indicate-empty-lines t)
+
+;; Auto-Complete
+(use-package auto-complete)
+(ac-config-default)
 
 ;; Show column lines in mode-lin
 (column-number-mode t)
@@ -219,15 +226,52 @@
 
 
 ;; Company
-(use-package company)
-(add-hook 'after-init-hook 'global-company-mode)
+;; (use-package company)
+;; (add-hook 'after-init-hook 'global-company-mode)
 
 ;; jedi-company
-(use-package company-jedi)
+;; (use-package company-jedi)
 
 ;; php
-(use-package php-mode)
+;; (use-package php-mode)
 (use-package ac-php)
+
+(autoload 'php-mode "php-mode.el" "Php mode." t)
+(setq auto-mode-alist (append '(("/.*\.php[345]?\'" . php-mode)) auto-mode-alist))
+
+;; Python
+(use-package elpy)
+(elpy-enable)
+
+(add-hook 'php-mode-hook
+            '(lambda ()
+               (auto-complete-mode t)
+               (require 'ac-php)
+               (setq ac-sources  '(ac-source-php ) )
+               (yas-global-mode 1)
+               (define-key php-mode-map  (kbd "C-]") 'ac-php-find-symbol-at-point)   ;goto define
+               (define-key php-mode-map  (kbd "C-t") 'ac-php-location-stack-back   ) ;go back
+               ))
 
 ;; Replace selected text
 (delete-selection-mode 1)
+
+(setq tramp-default-method "ssh")
+
+;; Default to global linum mode
+(global-linum-mode 1)
+
+(use-package restclient)
+
+;; Org mode
+(use-package org-bullets
+  :ensure t
+  :init
+  (setq org-bullets-bullet-list
+	'("◉" "◎" "⚫" "○" "►" "◇"))
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
+(sequence "⚑ WAITING(w)" "|")
+(sequence "|" "✘ CANCELED(c)")))
