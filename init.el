@@ -275,3 +275,24 @@
 (setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
 (sequence "⚑ WAITING(w)" "|")
 (sequence "|" "✘ CANCELED(c)")))
+
+
+;; C++
+(use-package ggtags)
+(use-package helm-gtags)
+(use-package helm-projectile)
+(use-package helm-swoop)
+(use-package projectile)
+
+(projectile-global-mode)
+(setq projectile-enable-caching t)
+
+(helm-projectile-on)
+(setq projectile-completion-system 'helm)
+
+(use-package flycheck)
+(global-flycheck-mode)
+
+
+;; Twitter bootstrap org export
+(use-package ox-twbs)
