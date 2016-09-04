@@ -1,3 +1,5 @@
+(setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+
 ;;;;;;;;;;;;;
 ;; General ;;
 ;;;;;;;;;;;;;
@@ -212,6 +214,9 @@
    '(helm-apropos-fuzzy-match t)
    '(helm-completion-in-region-fuzzy-match t)))
 
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
 ;; Helm keybindings
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x b") 'helm-mini)
@@ -260,6 +265,7 @@
 
 ;; Default to global linum mode
 (global-linum-mode 1)
+(setq org-alphabetical-lists t)
 
 (use-package restclient)
 
@@ -281,7 +287,27 @@
 (use-package ggtags)
 (use-package helm-gtags)
 (use-package helm-projectile)
+
+;; Swoop
 (use-package helm-swoop)
+
+(global-set-key (kbd "M-i") 'helm-swoop)
+(global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
+(global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
+(global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
+;; When doing isearch, hand the word over to helm-swoop
+(define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+
+;; Move up and down like isearch
+(define-key helm-swoop-map (kbd "C-r") 'helm-previous-line)
+(define-key helm-swoop-map (kbd "C-s") 'helm-next-line)
+(define-key helm-multi-swoop-map (kbd "C-r") 'helm-previous-line)
+(define-key helm-multi-swoop-map (kbd "C-s") 'helm-next-line)
+
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
+
 (use-package projectile)
 
 (projectile-global-mode)
@@ -296,3 +322,32 @@
 
 ;; Twitter bootstrap org export
 (use-package ox-twbs)
+
+
+;; Eval and replace by magnars
+(defun eval-and-replace ()
+  "Replace the preceding sexp with its value."
+  (interactive)
+  (backward-kill-sexp)
+  (condition-case nil
+      (prin1 (eval (read (current-kill 0)))
+             (current-buffer))
+    (error (message "Invalid expression")
+           (insert (current-kill 0)))))
+
+(global-set-key (kbd "C-x C-e") 'eval-and-replace)
+
+;; Aggresive Indent
+(use-package aggressive-indent)
+(global-aggressive-indent-mode 1)
+
+
+;; Emojis because why not
+(use-package emojify)
+;; Enable emojify gloablly
+(add-hook 'after-init-hook #'global-emojify-mode)
+
+
+;; Which key
+(use-package which-key)
+(which-key-mode)
