@@ -235,7 +235,9 @@
 
 
 ;; Company
-;; (use-package company)
+(use-package company
+  :init
+  (global-company-mode))
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
 ;; jedi-company
@@ -243,24 +245,18 @@
 
 ;; php
 ;; (use-package php-mode)
-(use-package ac-php)
+;; (use-package ac-php)
+(use-package company-php)
 
-(autoload 'php-mode "php-mode.el" "Php mode." t)
-(setq auto-mode-alist (append '(("/.*\.php[345]?\'" . php-mode)) auto-mode-alist))
+(add-hook 'php-mode-hook
+          '(lambda ()
+             (require 'company-php)
+             (company-mode t)
+             (add-to-list 'company-backends 'company-ac-php-backend )))
 
 ;; Python
 (use-package elpy)
 (elpy-enable)
-
-(add-hook 'php-mode-hook
-            '(lambda ()
-               (auto-complete-mode t)
-               (require 'ac-php)
-               (setq ac-sources  '(ac-source-php ) )
-               (yas-global-mode 1)
-               (define-key php-mode-map  (kbd "C-]") 'ac-php-find-symbol-at-point)   ;goto define
-               (define-key php-mode-map  (kbd "C-t") 'ac-php-location-stack-back   ) ;go back
-               ))
 
 ;; Replace selected text
 (delete-selection-mode 1)
@@ -371,3 +367,7 @@
 (add-to-list 'auto-mode-alist '("\\.network\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.link\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
+
+
+;; Dash
+(use-package dash)
