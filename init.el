@@ -46,8 +46,8 @@
 (setq inhibit-splash-screen t)
 
 ;; Set font
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11" ))
-(set-face-attribute 'default t :font "DejaVu Sans Mono-11")
+;; (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11" ))
+;; (set-face-attribute 'default t :font "DejaVu Sans Mono-11")
 
 ;; Set theme
 (use-package monokai-theme
@@ -84,8 +84,9 @@
 (setq-default indicate-empty-lines t)
 
 ;; Auto-Complete
-(use-package auto-complete)
-(ac-config-default)
+(use-package auto-complete
+  :config
+  (ac-config-default))
 
 ;; Show column lines in mode-lin
 (column-number-mode t)
@@ -98,9 +99,6 @@
   (eval-after-load "simple" '(diminish 'overwrite-mode))
   (eval-after-load "autorevert" '(diminish 'auto-revert-mode)))
 
-;; Start server if not started
-(require 'server)
-(if (not (server-running-p)) (server-start))
 
 ;; Backup & auto-save in one directory
 (setq backup-directory-alist `((".*" . "~/.emacs.d/tmp"))
@@ -165,8 +163,9 @@
 (require 'smartparens-config)
 
 ;; indent guide
-(use-package indent-guide)
-(indent-guide-global-mode)
+(use-package indent-guide
+  :config
+  (indent-guide-global-mode))
 
 ;;;;;;;;;;;;;;;;;;;
 ;; Sane defaults ;;
@@ -265,7 +264,7 @@
 
 ;; Default to global linum mode
 (global-linum-mode 1)
-(setq org-alphabetical-lists t)
+;; (setq org-alphabetical-lists t)
 
 (use-package restclient)
 
@@ -351,3 +350,4 @@
 ;; Which key
 (use-package which-key)
 (which-key-mode)
+
