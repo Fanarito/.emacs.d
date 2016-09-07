@@ -50,16 +50,21 @@
 ;; (set-face-attribute 'default t :font "DejaVu Sans Mono-11")
 
 ;; Set theme
-(use-package monokai-theme
-  :init
-  (setq monokai-use-variable-pitch nil
-        monokai-height-minus-1 1.0
-        monokai-height-plus-1 1.0
-        monokai-height-plus-2 1.0
-        monokai-height-plus-3 1.0
-        monokai-height-plus-4 1.0)
-  :config
-  (load-theme 'monokai t))
+;; (use-package monokai-theme
+;;   :init
+;;   (setq monokai-use-variable-pitch nil
+;;         monokai-height-minus-1 1.0
+;;         monokai-height-plus-1 1.0
+;;         monokai-height-plus-2 1.0
+;;         monokai-height-plus-3 1.0
+;;         monokai-height-plus-4 1.0)
+;;   :config
+;;   (load-theme 'monokai t))
+
+;; Add doom theme to loadpath
+(add-to-list 'load-path "~/.emacs.d/themes/doom-theme")
+(require 'doom-theme)
+(load-theme 'doom-one t)
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
@@ -351,3 +356,18 @@
 (use-package which-key)
 (which-key-mode)
 
+
+
+;; systemd file highlight
+(add-to-list 'auto-mode-alist '("\\.service\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.timer\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.target\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.mount\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.slice\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.socket\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.path\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.netdev\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.network\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.link\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
