@@ -62,6 +62,10 @@
 ;;   (load-theme 'monokai t))
 
 ;; Add doom theme to loadpath
+
+;; Doom requires Dash
+(use-package dash)
+
 (add-to-list 'load-path "~/.emacs.d/themes/doom-theme")
 (require 'doom-theme)
 (load-theme 'doom-one t)
@@ -367,7 +371,3 @@
 (add-to-list 'auto-mode-alist '("\\.network\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.link\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
-
-
-;; Dash
-(use-package dash)
