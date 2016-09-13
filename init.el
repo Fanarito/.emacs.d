@@ -93,9 +93,9 @@
 (setq-default indicate-empty-lines t)
 
 ;; Auto-Complete
-(use-package auto-complete
-  :config
-  (ac-config-default))
+;; (use-package auto-complete
+;;   :config
+;;   (ac-config-default))
 
 ;; Show column lines in mode-lin
 (column-number-mode t)
@@ -164,8 +164,9 @@
 (global-set-key (kbd "C-.") #'imenu-anywhere)
 
 ;; ace-window
-(use-package ace-window)
-(global-set-key (kbd "M-p") 'ace-window)
+(use-package ace-window
+  :init
+  (global-set-key (kbd "M-p") 'ace-window))
 
 ;; smart-parens
 (use-package smartparens)
@@ -243,6 +244,10 @@
   :init
   (global-company-mode))
 
+(use-package company-c-headers
+  :init
+  (add-to-list 'company-backends 'company-c-headers))
+
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
 ;; jedi-company
@@ -251,17 +256,22 @@
 ;; php
 ;; (use-package php-mode)
 ;; (use-package ac-php)
-(use-package company-php)
+;; (use-package company-quickhelp
+;;   :init
+;;   (company-quickhelp-mode 1))
 
-(add-hook 'php-mode-hook
-          '(lambda ()
-             (require 'company-php)
-             (company-mode t)
-             (add-to-list 'company-backends 'company-ac-php-backend )))
+(use-package company-php
+  :init
+  (add-hook 'php-mode-hook
+	    '(lambda ()
+	       (require 'company-php)
+	       (company-mode t)
+	       (add-to-list 'company-backends 'company-ac-php-backend ))))
 
 ;; Python
-(use-package elpy)
-(elpy-enable)
+(use-package elpy
+  :init
+  (elpy-enable))
 
 ;; Replace selected text
 (delete-selection-mode 1)
@@ -284,14 +294,38 @@
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (setq org-todo-keywords '((sequence "☛ TODO(t)" "|" "✔ DONE(d)")
-(sequence "⚑ WAITING(w)" "|")
-(sequence "|" "✘ CANCELED(c)")))
+			  (sequence "⚑ WAITING(w)" "|")
+			  (sequence "|" "✘ CANCELED(c)")))
 
 
 ;; C++
 (use-package ggtags)
 (use-package helm-gtags)
 (use-package helm-projectile)
+(use-package irony)
+(use-package company-irony)
+
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
+
+(use-package flycheck-irony)
+
+(eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+(add-hook 'objc-mode-hook 'irony-mode)
+
+;; replace the `completion-at-point' and `complete-symbol' bindings in
+;; irony-mode's buffers by irony-mode's function
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
 ;; Swoop
 (use-package helm-swoop)
@@ -320,6 +354,14 @@
 
 (helm-projectile-on)
 (setq projectile-completion-system 'helm)
+
+(use-package helm-company
+  :init
+  (eval-after-load 'company
+    '(progn
+       (define-key company-mode-map (kbd "C-:") 'helm-company)
+       (define-key company-active-map (kbd "C-:") 'helm-company)))
+  )
 
 (use-package flycheck)
 (global-flycheck-mode)
@@ -365,7 +407,7 @@
 (add-to-list 'auto-mode-alist '("\\.target\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.mount\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
-(add-to-list 'auto-mode-alist '("\\.slice\\'" . conf-unix-mode))
+p(add-to-list 'auto-mode-alist '("\\.slice\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.socket\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.path\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.netdev\\'" . conf-unix-mode))
