@@ -396,10 +396,17 @@
 
 
 ;; Which key
-(use-package which-key)
-(which-key-mode)
+(use-package which-key
+  :init
+  (which-key-mode)
+  )
 
-
+;; auctex
+;; (use-package auctex
+;;   :init
+;;   (require 'auctex)
+;;   (require 'tex))
+;; (use-package company-auctex)
 
 ;; systemd file highlight
 (add-to-list 'auto-mode-alist '("\\.service\\'" . conf-unix-mode))
@@ -407,10 +414,14 @@
 (add-to-list 'auto-mode-alist '("\\.target\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.mount\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
-p(add-to-list 'auto-mode-alist '("\\.slice\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.slice\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.socket\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.path\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.netdev\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.network\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.link\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.automount\\'" . conf-unix-mode))
+
+;; gdb-config
+(setq gdb-many-windows t
+      gdb-show-main t)
