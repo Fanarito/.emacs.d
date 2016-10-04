@@ -48,6 +48,9 @@
 ;; Set font
 ;; (add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11" ))
 ;; (set-face-attribute 'default t :font "DejaVu Sans Mono-11")
+(set-default-font "Hack-12")
+;; (set-face-attribute 'default nil :font "Hack-12" )
+;; (set-frame-font "Hack-12" nil t)
 
 ;; Set theme
 ;; (use-package monokai-theme
@@ -69,6 +72,8 @@
 (add-to-list 'load-path "~/.emacs.d/themes/doom-theme")
 (require 'doom-theme)
 (load-theme 'doom-one t)
+;; Set cursor color to be more visible
+(set-cursor-color "#e4eff2")
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
@@ -153,11 +158,13 @@
   :diminish yas-minor-mode
   :config
   (yas-global-mode 1))
-(use-package ace-jump-mode)
-(autoload 'ace-jump-mode-pop-mark
-  "ace-jump-mode")
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+(use-package ace-jump-mode
+  :config
+  (autoload 'ace-jump-mode-pop-mark
+    "ace-jump-mode")
+  (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+  (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark))
+
 
 ;; ido-imenu
 (use-package imenu-anywhere)
@@ -234,9 +241,12 @@
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 
 
-;; File associatons
-;; setup files ending in “.js” to open in js2-mode
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;; Better js mode
+(use-package js2-mode
+  :init
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+
+
 
 
 ;; Company
@@ -425,3 +435,25 @@
 ;; gdb-config
 (setq gdb-many-windows t
       gdb-show-main t)
+
+
+;; You may want Emacs to show you the time
+(setq display-time-default-load-average nil)
+(display-time-mode t)
+
+;; exwm
+(use-package exwm
+  :config
+  (require 'exwm-config)
+  (exwm-config-default))
+
+
+(use-package minibuffer-line)
+(setq minibuffer-line-format '((:eval
+                                (let ((time-string (format-time-string "%l:%M %b %d %a")))
+                                  (concat
+                                   (make-string (- (frame-text-cols)
+                                                   (string-width time-string)) ? )
+                                   time-string)))))
+(minibuffer-line-mode)
+
